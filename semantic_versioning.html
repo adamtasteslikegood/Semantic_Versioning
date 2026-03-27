@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Semantic Versioning (SemVer) 2.0.0 Explorer</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+            rel="stylesheet"
+        />
+
+        <!-- Chosen Palette: Warm Neutral Developer (Stone 50 bg, Stone 800 text, Sky 600 accents, Rose/Amber/Emerald status colors) -->
+        <!-- Application Structure Plan: The SPA is structured as a technical dashboard/interactive guide. It begins with the core definitions of SemVer to establish baseline knowledge, followed by an interactive "Version Simulator" to demonstrate the rules in practice. It then includes a visual progression chart to show version history over time. Finally, it dedicates a major interactive section to the "Regex Parser" based on the source report, allowing users to test and visualize the capture groups of the SemVer regular expressions. This flow moves from theory -> practical simulation -> visual synthesis -> technical validation. -->
+        <!-- Visualization & Content Choices:
+         1. Rules Breakdown -> Goal: Inform -> Method: Grid Cards -> Justification: Breaks dense text into scannable chunks.
+         2. Version Builder -> Goal: Change/Interact -> Method: JS State UI -> Justification: Active learning of increment rules.
+         3. Version History -> Goal: Compare/Trends -> Method: Chart.js Stepped Line Chart -> Justification: Visually maps the concept of major/minor/patch jumps over time. NO SVG used.
+         4. Live Regex Tester -> Goal: Organize/Validate -> Method: JS Regex Engine + HTML output -> Justification: Makes the static regex document interactive and immediately useful. -->
+        <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+        <style>
+            body {
+                font-family: "Inter", sans-serif;
+            }
+            .font-mono {
+                font-family: "Fira Code", monospace;
+            }
+            .chart-container {
+                position: relative;
+                width: 100%;
+                max-width: 800px;
+                margin-left: auto;
+                margin-right: auto;
+                height: 350px;
+                max-height: 400px;
+            }
+            .glass-panel {
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(229, 231, 235, 0.5);
+            }
+            .nav-active {
+                border-bottom: 2px solid #0284c7;
+                color: #0284c7;
+                font-weight: 600;
+            }
+            .regex-hl {
+                background-color: #fef08a;
+                padding: 0.125rem 0.25rem;
+                border-radius: 0.25rem;
+            }
+            a {
+                color: #0284c7;
+                text-decoration: underline;
+            }
+            a:hover {
+                color: #0369a1;
+            }
+        </style>
+    </head>
+    <body
+        class="bg-stone-50 text-stone-800 antialiased selection:bg-sky-200 selection:text-sky-900"
+    >
+        <nav class="sticky top-0 z-50 glass-panel shadow-sm">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center space-x-3">
+                        <div
+                            class="w-8 h-8 rounded bg-sky-600 text-white flex items-center justify-center font-bold font-mono text-sm"
+                        >
+                            v2
+                        </div>
+                        <span class="font-bold text-xl tracking-tight"
+                            >SemVer Explorer</span
+                        >
+                    </div>
+                    <div class="hidden md:flex items-center space-x-8">
+                        <button
+                            onclick="scrollToSection('rules')"
+                            class="text-sm font-medium hover:text-sky-600 transition-colors"
+                        >
+                            Core Rules
+                        </button>
+                        <button
+                            onclick="scrollToSection('simulator')"
+                            class="text-sm font-medium hover:text-sky-600 transition-colors"
+                        >
+                            Simulator
+                        </button>
+                        <button
+                            onclick="scrollToSection('ai-analyzer')"
+                            class="text-sm font-bold text-sky-600 hover:text-sky-800 transition-colors flex items-center"
+                        >
+                            ✨ AI Analyzer
+                        </button>
+                        <button
+                            onclick="scrollToSection('regex')"
+                            class="text-sm font-medium hover:text-sky-600 transition-colors"
+                        >
+                            Regex Parser
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-20">
+            <section id="hero" class="text-center max-w-3xl mx-auto pt-10">
+                <h1
+                    class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-6"
+                >
+                    Escape Dependency Hell.
+                </h1>
+                <p class="text-lg text-stone-600 mb-8 leading-relaxed">
+                    Semantic Versioning (SemVer) provides a formal specification
+                    dictating how version numbers are assigned and incremented.
+                    By giving a name and clear definition to versioning, it
+                    becomes easy to communicate your intentions to the users of
+                    your software.
+                </p>
+                <div
+                    class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-sky-700 bg-sky-100 mb-4 font-mono"
+                >
+                    MAJOR.MINOR.PATCH
+                </div>
+            </section>
+
+            <section id="rules" class="scroll-mt-20">
+                <div class="mb-8">
+                    <h2
+                        class="text-2xl font-bold mb-4 border-b border-stone-200 pb-2"
+                    >
+                        The Increment Rules
+                    </h2>
+                    <p class="text-stone-600">
+                        This section breaks down the foundational rules of
+                        SemVer 2.0.0. It defines exactly when you must increment
+                        the Major, Minor, or Patch numbers, establishing the
+                        contract between software creators and consumers
+                        regarding API stability.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div
+                        class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow"
+                    >
+                        <div
+                            class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center mb-4"
+                        >
+                            <span class="text-rose-600 font-bold text-xl"
+                                >X</span
+                            >
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">MAJOR</h3>
+                        <p class="text-sm text-stone-600 mb-4">
+                            Incompatible API changes.
+                        </p>
+                        <ul class="text-sm space-y-2 text-stone-700">
+                            <li class="flex items-start">
+                                <span class="mr-2 text-rose-500 font-bold"
+                                    >•</span
+                                >
+                                Increment when breaking backwards compatibility.
+                            </li>
+                            <li class="flex items-start">
+                                <span class="mr-2 text-rose-500 font-bold"
+                                    >•</span
+                                >
+                                Resets Minor and Patch to 0.
+                            </li>
+                            <li class="flex items-start">
+                                <span class="mr-2 text-rose-500 font-bold"
+                                    >•</span
+                                >
+                                Version 0.y.z is for initial unstable
+                                development.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div
+                        class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow"
+                    >
+                        <div
+                            class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4"
+                        >
+                            <span class="text-amber-600 font-bold text-xl"
+                                >Y</span
+                            >
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">MINOR</h3>
+                        <p class="text-sm text-stone-600 mb-4">
+                            Backwards compatible features.
+                        </p>
+                        <ul class="text-sm space-y-2 text-stone-700">
+                            <li class="flex items-start">
+                                <span class="mr-2 text-amber-500 font-bold"
+                                    >•</span
+                                >
+                                Increment for new functionality that does not
+                                break API.
+                            </li>
+                            <li class="flex items-start">
+                                <span class="mr-2 text-amber-500 font-bold"
+                                    >•</span
+                                >
+                                Increment if API functionality is deprecated.
+                            </li>
+                            <li class="flex items-start">
+                                <span class="mr-2 text-amber-500 font-bold"
+                                    >•</span
+                                >
+                                Resets Patch to 0.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div
+                        class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow"
+                    >
+                        <div
+                            class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mb-4"
+                        >
+                            <span class="text-emerald-600 font-bold text-xl"
+                                >Z</span
+                            >
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">PATCH</h3>
+                        <p class="text-sm text-stone-600 mb-4">
+                            Backwards compatible bug fixes.
+                        </p>
+                        <ul class="text-sm space-y-2 text-stone-700">
+                            <li class="flex items-start">
+                                <span class="mr-2 text-emerald-500 font-bold"
+                                    >•</span
+                                >
+                                Increment for internal changes fixing incorrect
+                                behavior.
+                            </li>
+                            <li class="flex items-start">
+                                <span class="mr-2 text-emerald-500 font-bold"
+                                    >•</span
+                                >
+                                Must NOT affect the public API.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section
+                id="simulator"
+                class="scroll-mt-20 bg-stone-100 rounded-2xl p-6 sm:p-10 border border-stone-200"
+            >
+                <div class="mb-8 max-w-3xl">
+                    <h2
+                        class="text-2xl font-bold mb-4 border-b border-stone-300 pb-2"
+                    >
+                        Interactive Version Simulator
+                    </h2>
+                    <p class="text-stone-600">
+                        Interact with the buttons below to see how different
+                        development events affect the Semantic Version number.
+                        This active simulation demonstrates the cascading reset
+                        rules (e.g., Major updates resetting Minor and Patch).
+                    </p>
+                </div>
+
+                <div
+                    class="flex flex-col md:flex-row gap-10 items-center justify-between"
+                >
+                    <div
+                        class="w-full md:w-1/2 text-center bg-white p-8 rounded-xl shadow-inner border border-stone-200"
+                    >
+                        <div
+                            class="text-sm text-stone-500 uppercase tracking-widest font-semibold mb-2"
+                        >
+                            Current Version
+                        </div>
+                        <div
+                            id="sim-display"
+                            class="text-5xl sm:text-7xl font-mono font-bold text-slate-800 tracking-tight transition-all duration-300"
+                        >
+                            1.0.0
+                        </div>
+                        <div
+                            id="sim-reason"
+                            class="mt-4 text-sm text-stone-500 h-8 font-medium"
+                        >
+                            Initial Public Release
+                        </div>
+                    </div>
+
+                    <div
+                        class="w-full md:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-4"
+                    >
+                        <button
+                            onclick="simIncrement('patch')"
+                            class="px-4 py-3 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg font-medium hover:bg-emerald-100 transition flex flex-col items-center"
+                        >
+                            <span>Fix a Bug</span>
+                            <span class="text-xs font-mono mt-1 opacity-70"
+                                >+ PATCH</span
+                            >
+                        </button>
+                        <button
+                            onclick="simIncrement('minor')"
+                            class="px-4 py-3 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg font-medium hover:bg-amber-100 transition flex flex-col items-center"
+                        >
+                            <span>Add Feature</span>
+                            <span class="text-xs font-mono mt-1 opacity-70"
+                                >+ MINOR</span
+                            >
+                        </button>
+                        <button
+                            onclick="simIncrement('major')"
+                            class="px-4 py-3 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg font-medium hover:bg-rose-100 transition flex flex-col items-center"
+                        >
+                            <span>Break API</span>
+                            <span class="text-xs font-mono mt-1 opacity-70"
+                                >+ MAJOR</span
+                            >
+                        </button>
+                        <button
+                            onclick="simPreRelease()"
+                            class="px-4 py-3 bg-stone-50 text-stone-700 border border-stone-200 rounded-lg font-medium hover:bg-stone-200 transition flex flex-col items-center"
+                        >
+                            <span>Tag Pre-release</span>
+                            <span class="text-xs font-mono mt-1 opacity-70"
+                                >-alpha.1</span
+                            >
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="chart-section" class="scroll-mt-20">
+                <div class="mb-8">
+                    <h2
+                        class="text-2xl font-bold mb-4 border-b border-stone-200 pb-2"
+                    >
+                        Visualizing Version Progression
+                    </h2>
+                    <p class="text-stone-600">
+                        This chart provides a visual representation of how a
+                        software package might evolve over time. Notice how
+                        Patch releases create small steps, Minor releases create
+                        moderate steps, and Major releases represent significant
+                        leaps in the product's lifecycle.
+                    </p>
+                </div>
+
+                <div
+                    class="bg-white p-6 rounded-xl shadow-sm border border-stone-200"
+                >
+                    <div class="chart-container">
+                        <canvas id="progressionChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section
+                id="ai-analyzer"
+                class="scroll-mt-20 bg-sky-50 rounded-2xl p-6 sm:p-10 border border-sky-200 shadow-sm relative overflow-hidden"
+            >
+                <!-- Decorative background element -->
+                <div
+                    class="absolute -top-24 -right-24 w-64 h-64 bg-sky-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50"
+                ></div>
+
+                <div class="mb-8 max-w-3xl relative z-10">
+                    <h2
+                        class="text-2xl font-bold mb-4 border-b border-sky-300 pb-2 text-sky-900 flex items-center"
+                    >
+                        <span class="mr-2">✨</span> AI Release Analyzer
+                    </h2>
+                    <p class="text-sky-800">
+                        Not sure what your next version number should be? Paste
+                        your recent commit messages, pull request titles, or
+                        changelog notes below. Our Gemini-powered AI will
+                        analyze the changes against SemVer rules and recommend
+                        the correct version bump.
+                    </p>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-8 relative z-10">
+                    <div class="w-full md:w-1/2 space-y-4">
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-sky-900 mb-1"
+                                >Current Version</label
+                            >
+                            <input
+                                type="text"
+                                id="ai-current-version"
+                                value="1.2.3"
+                                class="w-full bg-white border border-sky-300 rounded-lg py-2 px-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 font-mono shadow-sm"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-sky-900 mb-1"
+                                >Recent Changes / Commits</label
+                            >
+                            <textarea
+                                id="ai-changes"
+                                rows="6"
+                                class="w-full bg-white border border-sky-300 rounded-lg py-2 px-3 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 placeholder-slate-400 text-sm shadow-sm"
+                                placeholder="- Added user authentication API&#10;- Fixed bug in password reset flow&#10;- BREAKING: Deprecated old /login endpoint (removed)"
+                            ></textarea>
+                        </div>
+                        <button
+                            onclick="runAiAnalysis()"
+                            id="ai-btn"
+                            class="w-full py-3 bg-sky-600 text-white rounded-lg font-bold hover:bg-sky-700 transition flex justify-center items-center shadow-md"
+                        >
+                            <span>✨ Analyze Changes</span>
+                        </button>
+                        <div
+                            id="ai-error"
+                            class="hidden mt-2 text-sm text-rose-600 font-medium text-center bg-rose-50 p-2 rounded border border-rose-200"
+                        ></div>
+                    </div>
+
+                    <div
+                        class="w-full md:w-1/2 bg-white rounded-xl shadow-inner border border-sky-200 p-6 flex flex-col justify-center relative min-h-[280px]"
+                    >
+                        <!-- Loading state -->
+                        <div
+                            id="ai-loading"
+                            class="absolute inset-0 bg-white/90 rounded-xl flex-col items-center justify-center hidden z-10"
+                        >
+                            <div
+                                class="w-10 h-10 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin mb-3"
+                            ></div>
+                            <span class="text-sky-700 font-medium"
+                                >Gemini is analyzing...</span
+                            >
+                        </div>
+
+                        <!-- Result state -->
+                        <div id="ai-result" class="hidden h-full flex-col">
+                            <div
+                                class="text-sm text-slate-500 uppercase tracking-widest font-semibold mb-1"
+                            >
+                                Recommended Version
+                            </div>
+                            <div class="flex items-center mb-4">
+                                <div
+                                    id="ai-next-version"
+                                    class="text-4xl sm:text-5xl font-mono font-bold text-slate-800 tracking-tight mr-4"
+                                ></div>
+                                <span
+                                    id="ai-bump-type"
+                                    class="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full"
+                                ></span>
+                            </div>
+                            <div
+                                class="text-sm text-slate-500 uppercase tracking-widest font-semibold mb-2"
+                            >
+                                Gemini's Reasoning
+                            </div>
+                            <p
+                                id="ai-explanation"
+                                class="text-slate-700 text-sm leading-relaxed overflow-y-auto flex-grow bg-slate-50 p-4 rounded border border-slate-100"
+                            ></p>
+                        </div>
+
+                        <!-- Empty state -->
+                        <div
+                            id="ai-empty"
+                            class="text-center text-slate-400 flex flex-col items-center justify-center h-full"
+                        >
+                            <div class="text-4xl mb-3 opacity-50 text-sky-600">
+                                ✨
+                            </div>
+                            <p>Submit your changes to see the AI analysis.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="regex" class="scroll-mt-20">
+                <div class="mb-8">
+                    <h2
+                        class="text-2xl font-bold mb-4 border-b border-stone-200 pb-2"
+                    >
+                        Live Regex Parser
+                    </h2>
+                    <p class="text-stone-600">
+                        Based on the official SemVer 2.0.0 specification, this
+                        tool uses the standard Regular Expression to validate
+                        and parse version strings. Type a version string below
+                        to see how the regex extracts the specific numbered
+                        capture groups (Major, Minor, Patch, Pre-release, and
+                        Build Metadata).
+                    </p>
+                </div>
+
+                <div class="bg-slate-900 rounded-2xl overflow-hidden shadow-xl">
+                    <div
+                        class="bg-slate-800 px-6 py-4 border-b border-slate-700 flex justify-between items-center"
+                    >
+                        <h3 class="text-slate-200 font-mono text-sm">
+                            semver_parser.js
+                        </h3>
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-rose-500"></div>
+                            <div
+                                class="w-3 h-3 rounded-full bg-amber-500"
+                            ></div>
+                            <div
+                                class="w-3 h-3 rounded-full bg-emerald-500"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 md:p-8">
+                        <div class="mb-6">
+                            <label
+                                for="regex-input"
+                                class="block text-slate-400 text-sm font-medium mb-2"
+                                >Enter Version String to Test:</label
+                            >
+                            <input
+                                type="text"
+                                id="regex-input"
+                                value="1.0.0-beta.2+exp.sha.5114f85"
+                                class="w-full bg-slate-800 border border-slate-600 rounded-lg py-3 px-4 text-emerald-400 font-mono text-lg focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-colors"
+                            />
+                        </div>
+
+                        <div
+                            id="validation-banner"
+                            class="mb-6 p-4 rounded-lg flex items-center"
+                        ></div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div
+                                class="bg-slate-800 rounded-lg p-5 border border-slate-700"
+                            >
+                                <h4
+                                    class="text-slate-400 text-xs uppercase tracking-wider mb-4 font-bold"
+                                >
+                                    Numbered Capture Groups
+                                </h4>
+                                <div
+                                    class="space-y-3 font-mono text-sm"
+                                    id="capture-groups"
+                                ></div>
+                            </div>
+
+                            <div
+                                class="bg-slate-800 rounded-lg p-5 border border-slate-700"
+                            >
+                                <h4
+                                    class="text-slate-400 text-xs uppercase tracking-wider mb-4 font-bold"
+                                >
+                                    Official Regex (ECMAScript/PCRE)
+                                </h4>
+                                <div
+                                    class="text-xs text-sky-300 font-mono break-all leading-relaxed bg-slate-900 p-4 rounded border border-slate-700"
+                                >
+                                    ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+                                </div>
+                                <p class="text-slate-400 text-xs mt-4">
+                                    This regex ensures no leading zeroes on
+                                    numeric identifiers and strictly validates
+                                    allowed ASCII characters.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer
+            class="bg-stone-900 text-stone-400 py-8 mt-20 text-center text-sm"
+        >
+            <p>
+                Based on the
+                <a href="https://semver.org/"
+                    >Semantic Versioning 2.0.0 Specification</a
+                >
+                authored by Tom Preston-Werner.
+            </p>
+        </footer>
+
+        <script>
+            function scrollToSection(id) {
+                document
+                    .getElementById(id)
+                    .scrollIntoView({ behavior: "smooth" });
+            }
+
+            let simState = { major: 1, minor: 0, patch: 0, pre: "" };
+            const simDisplay = document.getElementById("sim-display");
+            const simReason = document.getElementById("sim-reason");
+
+            function updateSimDisplay(reason) {
+                let ver = `${simState.major}.${simState.minor}.${simState.patch}`;
+                if (simState.pre) ver += `-${simState.pre}`;
+
+                simDisplay.style.opacity = "0";
+                setTimeout(() => {
+                    simDisplay.textContent = ver;
+                    simReason.textContent = reason;
+                    simDisplay.style.opacity = "1";
+
+                    simDisplay.classList.add("text-sky-600");
+                    setTimeout(() => {
+                        simDisplay.classList.remove("text-sky-600");
+                    }, 300);
+                }, 150);
+            }
+
+            function simIncrement(type) {
+                if (type === "major") {
+                    simState.major++;
+                    simState.minor = 0;
+                    simState.patch = 0;
+                    simState.pre = "";
+                    updateSimDisplay(
+                        "Incompatible API change. Minor and Patch reset to 0.",
+                    );
+                } else if (type === "minor") {
+                    simState.minor++;
+                    simState.patch = 0;
+                    simState.pre = "";
+                    updateSimDisplay(
+                        "Backwards compatible feature added. Patch reset to 0.",
+                    );
+                } else if (type === "patch") {
+                    simState.patch++;
+                    simState.pre = "";
+                    updateSimDisplay("Backwards compatible bug fix.");
+                }
+            }
+
+            function simPreRelease() {
+                if (simState.pre === "") {
+                    simState.pre = "alpha.1";
+                } else {
+                    let parts = simState.pre.split(".");
+                    let num = parseInt(parts[1] || 0) + 1;
+                    simState.pre = `alpha.${num}`;
+                }
+                updateSimDisplay("Pre-release tagged. Indicates instability.");
+            }
+
+            const semverRegex =
+                /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
+            const regexInput = document.getElementById("regex-input");
+            const validationBanner =
+                document.getElementById("validation-banner");
+            const captureGroups = document.getElementById("capture-groups");
+
+            function evaluateRegex() {
+                const val = regexInput.value.trim();
+                const match = semverRegex.exec(val);
+
+                if (match) {
+                    validationBanner.className =
+                        "mb-6 p-4 rounded-lg flex items-center bg-emerald-900/50 border border-emerald-800 text-emerald-400";
+                    validationBanner.innerHTML = `<span class="text-xl mr-3 font-bold">✓</span> Valid Semantic Version String`;
+
+                    captureGroups.innerHTML = `
+                    <div class="flex justify-between items-center py-1 border-b border-slate-700">
+                        <span class="text-slate-400">cg1 = major</span>
+                        <span class="text-white bg-slate-700 px-2 py-0.5 rounded">${match[1]}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1 border-b border-slate-700">
+                        <span class="text-slate-400">cg2 = minor</span>
+                        <span class="text-white bg-slate-700 px-2 py-0.5 rounded">${match[2]}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1 border-b border-slate-700">
+                        <span class="text-slate-400">cg3 = patch</span>
+                        <span class="text-white bg-slate-700 px-2 py-0.5 rounded">${match[3]}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1 border-b border-slate-700">
+                        <span class="text-slate-400">cg4 = prerelease</span>
+                        <span class="${match[4] ? "text-amber-300 bg-amber-900/50" : "text-slate-500"} px-2 py-0.5 rounded">${match[4] || "undefined"}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1">
+                        <span class="text-slate-400">cg5 = buildmetadata</span>
+                        <span class="${match[5] ? "text-sky-300 bg-sky-900/50" : "text-slate-500"} px-2 py-0.5 rounded">${match[5] || "undefined"}</span>
+                    </div>
+                `;
+                } else {
+                    validationBanner.className =
+                        "mb-6 p-4 rounded-lg flex items-center bg-rose-900/50 border border-rose-800 text-rose-400";
+                    validationBanner.innerHTML = `<span class="text-xl mr-3 font-bold">✗</span> Invalid Semantic Version String`;
+
+                    captureGroups.innerHTML = `
+                    <div class="text-slate-500 italic text-center py-4">
+                        Regex failed to match.<br>Ensure format is X.Y.Z without leading zeroes.
+                    </div>
+                `;
+                }
+            }
+
+            regexInput.addEventListener("input", evaluateRegex);
+            evaluateRegex();
+
+            const ctx = document
+                .getElementById("progressionChart")
+                .getContext("2d");
+            const progressionData = [
+                { version: "0.1.0", level: 0.1, label: "Initial Dev" },
+                { version: "0.2.0", level: 0.2, label: "Minor update" },
+                { version: "1.0.0", level: 1.0, label: "Public API" },
+                { version: "1.0.1", level: 1.1, label: "Bug fix" },
+                { version: "1.0.2", level: 1.2, label: "Bug fix" },
+                { version: "1.1.0", level: 2.0, label: "New feature" },
+                { version: "1.2.0", level: 2.5, label: "New feature" },
+                { version: "2.0.0", level: 4.0, label: "Breaking Change" },
+                { version: "2.0.1", level: 4.1, label: "Bug fix" },
+            ];
+
+            new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: progressionData.map((d) => d.version),
+                    datasets: [
+                        {
+                            label: "Version Magnitude",
+                            data: progressionData.map((d) => d.level),
+                            borderColor: "#0284c7",
+                            backgroundColor: "rgba(2, 132, 199, 0.1)",
+                            borderWidth: 3,
+                            pointBackgroundColor: "#fff",
+                            pointBorderColor: "#0284c7",
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            stepped: "before",
+                            fill: true,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const dataObj =
+                                        progressionData[context.dataIndex];
+                                    return ` Action: ${dataObj.label}`;
+                                },
+                            },
+                            padding: 10,
+                            backgroundColor: "rgba(15, 23, 42, 0.9)",
+                            titleFont: {
+                                size: 14,
+                                family: "'Fira Code', monospace",
+                            },
+                            bodyFont: {
+                                size: 13,
+                                family: "'Inter', sans-serif",
+                            },
+                        },
+                    },
+                    scales: {
+                        y: {
+                            display: false,
+                            beginAtZero: true,
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                font: {
+                                    family: "'Fira Code', monospace",
+                                    size: 11,
+                                },
+                            },
+                        },
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: "index",
+                    },
+                },
+            });
+
+            // --- GEMINI API INTEGRATION ---
+            const apiKey = ""; // Set by execution environment
+
+            function showAiError(msg) {
+                const errDiv = document.getElementById("ai-error");
+                errDiv.textContent = msg;
+                errDiv.classList.remove("hidden");
+                setTimeout(() => errDiv.classList.add("hidden"), 5000);
+            }
+
+            async function runAiAnalysis() {
+                const currentVersion = document
+                    .getElementById("ai-current-version")
+                    .value.trim();
+                const changes = document
+                    .getElementById("ai-changes")
+                    .value.trim();
+
+                if (!currentVersion || !changes) {
+                    showAiError(
+                        "Please enter both a current version and your recent changes.",
+                    );
+                    return;
+                }
+
+                // Update UI state for loading
+                document.getElementById("ai-empty").classList.add("hidden");
+                document.getElementById("ai-result").classList.add("hidden");
+                document.getElementById("ai-result").classList.remove("flex");
+                document
+                    .getElementById("ai-loading")
+                    .classList.remove("hidden");
+                document.getElementById("ai-loading").classList.add("flex");
+                document.getElementById("ai-error").classList.add("hidden");
+
+                const btn = document.getElementById("ai-btn");
+                btn.disabled = true;
+                btn.classList.add("opacity-75", "cursor-not-allowed");
+
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [
+                        {
+                            parts: [
+                                {
+                                    text: `Current Version: ${currentVersion}\n\nChanges/Commits:\n${changes}`,
+                                },
+                            ],
+                        },
+                    ],
+                    systemInstruction: {
+                        parts: [
+                            {
+                                text: "You are a strict Semantic Versioning 2.0.0 expert release manager. Analyze the provided 'Current Version' and the list of 'Changes/Commits'. Determine if the next release requires a MAJOR, MINOR, or PATCH bump based on standard SemVer rules. Briefly explain your logic referencing specific changes. Output your conclusion strictly as a JSON object.",
+                            },
+                        ],
+                    },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                bump_type: {
+                                    type: "STRING",
+                                    enum: [
+                                        "MAJOR",
+                                        "MINOR",
+                                        "PATCH",
+                                        "INVALID_FORMAT",
+                                    ],
+                                },
+                                next_version: { type: "STRING" },
+                                explanation: { type: "STRING" },
+                            },
+                            required: [
+                                "bump_type",
+                                "next_version",
+                                "explanation",
+                            ],
+                        },
+                    },
+                };
+
+                let retries = 5;
+                let delay = 1000;
+                let analysisData = null;
+
+                while (retries > 0 && !analysisData) {
+                    try {
+                        const response = await fetch(url, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(payload),
+                        });
+
+                        if (!response.ok)
+                            throw new Error(`API Error: ${response.status}`);
+
+                        const data = await response.json();
+                        analysisData = JSON.parse(
+                            data.candidates[0].content.parts[0].text,
+                        );
+                    } catch (error) {
+                        retries--;
+                        if (retries === 0) {
+                            showAiError(
+                                "Failed to communicate with the AI. Please try again later.",
+                            );
+                            resetAiUi();
+                            return;
+                        }
+                        await new Promise((res) => setTimeout(res, delay));
+                        delay *= 2;
+                    }
+                }
+
+                // Populate UI with JSON results
+                document.getElementById("ai-next-version").textContent =
+                    analysisData.next_version;
+                document.getElementById("ai-explanation").textContent =
+                    analysisData.explanation;
+
+                const typeBadge = document.getElementById("ai-bump-type");
+                typeBadge.textContent = analysisData.bump_type;
+
+                // Style the badge based on type
+                typeBadge.className =
+                    "px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full border";
+                if (analysisData.bump_type === "MAJOR") {
+                    typeBadge.classList.add(
+                        "bg-rose-100",
+                        "text-rose-800",
+                        "border-rose-300",
+                    );
+                } else if (analysisData.bump_type === "MINOR") {
+                    typeBadge.classList.add(
+                        "bg-amber-100",
+                        "text-amber-800",
+                        "border-amber-300",
+                    );
+                } else if (analysisData.bump_type === "PATCH") {
+                    typeBadge.classList.add(
+                        "bg-emerald-100",
+                        "text-emerald-800",
+                        "border-emerald-300",
+                    );
+                } else {
+                    typeBadge.classList.add(
+                        "bg-slate-200",
+                        "text-slate-700",
+                        "border-slate-300",
+                    );
+                }
+
+                // Hide loading, show results
+                document.getElementById("ai-loading").classList.add("hidden");
+                document.getElementById("ai-loading").classList.remove("flex");
+                document.getElementById("ai-result").classList.remove("hidden");
+                document.getElementById("ai-result").classList.add("flex");
+
+                btn.disabled = false;
+                btn.classList.remove("opacity-75", "cursor-not-allowed");
+            }
+
+            function resetAiUi() {
+                document.getElementById("ai-loading").classList.add("hidden");
+                document.getElementById("ai-loading").classList.remove("flex");
+                document.getElementById("ai-empty").classList.remove("hidden");
+
+                const btn = document.getElementById("ai-btn");
+                btn.disabled = false;
+                btn.classList.remove("opacity-75", "cursor-not-allowed");
+            }
+        </script>
+    </body>
+</html>
