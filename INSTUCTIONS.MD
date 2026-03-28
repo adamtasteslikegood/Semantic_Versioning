@@ -2,7 +2,9 @@
 
 ## Project Evolution & Publishing Guide
 
-This document outlines the steps to take this repository from an initial script (v0.1.0) to a fully published, stable release (v1.0.0) following Semantic Versioning rules.
+This document outlines the steps to take this repository from an initial script
+(v0.1.0) to a fully published, stable release (v1.0.0) following
+Semantic Versioning rules.
 
 ## Phase 1: Initial Setup (v0.1.0)
 
@@ -16,7 +18,7 @@ The API is considered unstable (0.y.z).
 
 ## Phase 2: Adding the API (v0.2.0)
 
-*Action: Adding functionality in a backwards-compatible manner (increment MINOR).*
+_Action: Adding functionality in a backwards-compatible manner (increment MINOR)._
 
 1. Install FastAPI and Uvicorn: `pip install fastapi uvicorn`
 2. Create a new file named `api.py`.
@@ -33,9 +35,9 @@ We want users to run this without needing Python installed.
 1. Install PyInstaller: `pip install pyinstaller`
 2. Run PyInstaller to create a single standalone binary for the CLI tool:
 
-    ```bash
-    pyinstaller --onefile main.py --name semver-tool
-    ```
+   ```bash
+   pyinstaller --onefile main.py --name semver-tool
+   ```
 
 3. Test the executable found in the `dist/` folder.
 
@@ -45,9 +47,9 @@ We want users to run this without needing Python installed.
 
 ### Phase 4: Preparing for PyPI (v0.4.0)
 
-------------------------------------
+---
 
-*Action: Project restructuring for distribution.*
+_Action: Project restructuring for distribution._
 
 1. Create a `pyproject.toml` file at the root of your repository to define the package metadata (name, version, dependencies).
 
@@ -61,7 +63,7 @@ We want users to run this without needing Python installed.
 
 ## Phase 5: The Public API & Stable Release (v1.0.0)
 
-------------------------------------
+---
 
 **Action: Declaring the API stable.**
 
@@ -85,8 +87,8 @@ twine upload dist/*
 
 Congratulations! You have successfully published a package and adhered strictly to Semantic Versioning throughout the process.
 
-------------------------------------
+---
 
->> Would you like me to go ahead and write the `api.py` file for
->> Phase 2 now, or are you still getting the initial folder
->> structure set up?
+> > Would you like me to go ahead and write the `api.py` file for
+> > Phase 2 now, or are you still getting the initial folder
+> > structure set up?

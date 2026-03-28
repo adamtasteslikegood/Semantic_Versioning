@@ -1,13 +1,10 @@
-You asked
-----------
+## You asked
 
 ---
 
-Gemini Replied
----------------
+## Gemini Replied
 
-Gemini said
------------
+## Gemini said
 
 _Canvas copied_
 

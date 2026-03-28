@@ -1,22 +1,22 @@
 # README.md
 
 ## SemVer Validator
-  
-  A command-line utility and foundational project for validating Semantic Versioning (SemVer) 2.0.0 strings. It parses valid version numbers into their constituent parts (Major, Minor, Patch, Pre-release, Build Metadata) and outputs the results as JSON.
-  
+
+A command-line utility and foundational project for validating Semantic Versioning (SemVer) 2.0.0 strings. It parses valid version numbers into their constituent parts (Major, Minor, Patch, Pre-release, Build Metadata) and outputs the results as JSON.
+
 ## Features
 
-* Strict adherence to SemVer 2.0.0 rules using official Regular Expressions.
-* Returns structured JSON data for easy integration with other tools.
-* Interactive mode for manual testing.
-* Designed to be expanded into a FastAPI service and published to PyPI.
-  
+- Strict adherence to SemVer 2.0.0 rules using official Regular Expressions.
+- Returns structured JSON data for easy integration with other tools.
+- Interactive mode for manual testing.
+- Designed to be expanded into a FastAPI service and published to PyPI.
+
 ## Usage
 
 ### Command Line
 
-  Pass a version string directly to the script to get a JSON response:
-  
+Pass a version string directly to the script to get a JSON response:
+
 ```bash
     python main.py 1.0.0-beta.2+exp.sha.5114f85
 ```
