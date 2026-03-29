@@ -1,0 +1,8 @@
+your-repo-folder/
+├── README.md
+├── INSTRUCTIONS.md
+├── semver_explorer.html
+├── pyproject.toml         <-- (We will create this next)
+└── semver_validator/      <-- (New folder)
+    ├── __init__.py        <-- (Empty file)
+    └── main.py            <-- (Moved here)
