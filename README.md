@@ -290,11 +290,38 @@ Project metadata is defined in `pyproject.toml`.
 
 Current package version:
 
-- `1.0.0`
+- `0.5.0`
 
 Script entrypoint:
 
 - `semver-cli = "semver_validator.main:main"`
+
+## Release Workflow
+
+Use `master` as the primary branch.
+
+Recommended branch naming:
+- `release/x.y.z` for the upcoming release integration branch
+- `feat/...` for new features
+- `fix/...` for bug fixes
+- `docs/...` for documentation-only changes
+- `chore/...` for maintenance tasks
+
+Examples:
+- `release/0.5.0`
+- `release/1.0.0`
+- `feat/analyzer-endpoint`
+- `fix/api-error-handling`
+- `docs/readme-api-usage`
+
+Recommended flow:
+1. create or update the active `release/x.y.z` branch from `master`
+2. merge completed `feat/...`, `fix/...`, `docs/...`, and `chore/...` branches into the active release branch
+3. verify CLI, API, and analyzer behavior
+4. update documentation and package metadata
+5. finalize the release branch
+6. merge it back into `master`
+7. tag the release from `master`
 
 ## Future Improvements
 
@@ -304,6 +331,7 @@ Potential future additions could include:
 - CI checks for CLI and API behavior
 - publishing workflow improvements
 - optional executable packaging
+- public API hardening and stability work for `1.0.0`
 
 ## License
 

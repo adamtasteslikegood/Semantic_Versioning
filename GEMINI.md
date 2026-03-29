@@ -54,14 +54,16 @@ Requirements:
 - avoid changing output keys casually
 
 ### 3. Respect the current versioning discipline
-This project is at `1.0.0`.
+This project is currently at `0.5.0` and is still pre-`1.0.0`.
 
-Treat the following as major-version concerns if changed:
+Breaking changes are still allowed before `1.0.0`, but they should be made intentionally and documented clearly.
+
+The goal for `1.0.0` is to stabilize the following public contracts:
 - validator output schema
-- CLI invocation/argument structure
+- CLI invocation and argument structure
 - API response contract
 
-Backward-compatible additions are preferred over breaking replacements.
+Backward-compatible additions are preferred over incompatible replacements.
 
 ### 4. Keep Gemini usage server-side
 The Gemini API key must not be exposed in frontend code.
@@ -184,6 +186,24 @@ Should fail:
 - `1.0.0-`
 - `1.0.0+`
 - `1.0.0-alpha..1`
+
+## Branch conventions
+
+Use `master` as the primary branch.
+
+Recommended branch naming:
+- `release/x.y.z` for the upcoming release integration branch
+- `feat/...` for new features
+- `fix/...` for bug fixes
+- `docs/...` for documentation-only changes
+- `chore/...` for maintenance tasks
+
+Examples:
+- `release/0.5.0`
+- `release/1.0.0`
+- `feat/analyzer-endpoint`
+- `fix/api-error-handling`
+- `docs/readme-api-usage`
 
 ## Non-goals
 

@@ -99,13 +99,15 @@ Important rules:
 
 ## Versioning Policy
 
-This project is currently at `1.0.0`.
+This project is currently at `0.5.0` and is still pre-`1.0.0`.
 
 Use Semantic Versioning carefully:
 
-- `MAJOR` for incompatible public API or CLI changes
+- `MAJOR` for incompatible public API or CLI changes after `1.0.0`
 - `MINOR` for backward-compatible functionality additions
 - `PATCH` for backward-compatible bug fixes
+
+Before `1.0.0`, breaking changes are still allowed, but they should be made intentionally, documented clearly, and used to move the project toward a stable public contract.
 
 For this repository, treat the following as public contracts:
 
@@ -301,17 +303,19 @@ pip install twine
 
 ## Suggested Release Workflow
 
-For a typical release:
+For the current pre-`1.0.0` milestone and upcoming stable release work:
 
-1. verify the validator still behaves correctly
-2. verify CLI behavior still works
-3. verify FastAPI endpoints still work
-4. verify `.env_example` matches the backend requirements
-5. update documentation if behavior changed
-6. update `pyproject.toml` version intentionally
-7. commit with a clear message
-8. tag the release
-9. build and publish
+1. create or update a `release/x.y.z` branch from `master`
+2. merge feature, fix, docs, and chore branches into the release branch
+3. verify the validator still behaves correctly
+4. verify CLI behavior still works
+5. verify FastAPI endpoints still work
+6. verify `.env_example` matches the backend requirements
+7. update documentation if behavior changed
+8. update `pyproject.toml` version intentionally
+9. commit with a clear message
+10. tag the release from `master` after the release branch is finalized
+11. build and publish
 
 ## Example Version Decisions
 
@@ -332,6 +336,31 @@ Use `MAJOR` when:
 - changing the validator response schema incompatibly
 - changing CLI arguments incompatibly
 - changing request or response structures in a breaking API way
+
+## Branch Strategy
+
+Use `master` as the primary branch.
+
+Recommended branch naming:
+- `release/x.y.z` for the upcoming release integration branch
+- `feat/...` for new features
+- `fix/...` for bug fixes
+- `docs/...` for documentation-only changes
+- `chore/...` for maintenance tasks
+
+Examples:
+- `release/0.5.0`
+- `release/1.0.0`
+- `feat/analyzer-endpoint`
+- `fix/api-error-handling`
+- `docs/readme-api-usage`
+
+Recommended flow:
+- branch feature work from the active release branch or from `master`, depending on team preference
+- merge completed `feat/...`, `fix/...`, `docs/...`, and `chore/...` branches into the active `release/x.y.z` branch
+- finalize and verify the release branch
+- merge the completed release branch back into `master`
+- tag the release from `master`
 
 ## Documentation Maintenance
 

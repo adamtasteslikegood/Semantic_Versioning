@@ -53,7 +53,7 @@ Current expectations:
 - valid input returns structured fields for version components
 - invalid input returns a failure payload with a readable reason
 
-Do not change output keys casually. Since the project is at `1.0.0`, breaking changes to response shape, CLI behavior, or API behavior should be treated as major-version concerns.
+Do not change output keys casually. The project is currently at `0.5.0`, so pre-`1.0.0` changes are still possible, but they should be intentional and documented clearly. The goal for `1.0.0` is to stabilize response shape, CLI behavior, and API behavior.
 
 ### 4. Keep dependencies minimal
 Use the standard library when possible.
@@ -173,6 +173,24 @@ Checklist:
 - determine whether API responses changed
 - determine whether the validator output schema changed
 - if yes, treat the change as a major-version concern and call it out explicitly
+
+## Branch conventions
+
+Use `master` as the primary branch.
+
+Recommended branch naming:
+- `release/x.y.z` for the upcoming release integration branch
+- `feat/...` for new features
+- `fix/...` for bug fixes
+- `docs/...` for documentation-only changes
+- `chore/...` for maintenance tasks
+
+Examples:
+- `release/0.5.0`
+- `release/1.0.0`
+- `feat/analyzer-endpoint`
+- `fix/api-error-handling`
+- `docs/readme-api-usage`
 
 ## Commit message defaults
 

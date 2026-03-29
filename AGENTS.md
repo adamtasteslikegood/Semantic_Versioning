@@ -46,8 +46,9 @@ Prefer small, correct, maintainable changes over broad refactors.
    - For invalid input, return a clear failure payload with a human-readable reason.
 
 3. **Versioning discipline**
-   - This project is at `1.0.0`.
-   - Any breaking change to the CLI interface, API contract, or output schema should be treated as a major-version concern.
+   - This project is currently at `0.5.0` and is still pre-`1.0.0`.
+   - Breaking changes are still allowed before `1.0.0`, but they should be made intentionally and documented clearly.
+   - The goal for `1.0.0` is to stabilize the CLI interface, API contracts, and output schema.
    - Backward-compatible additions are preferred over incompatible replacements.
 
 4. **Dependency discipline**
@@ -112,6 +113,24 @@ Useful validation cases include:
 - invalid: `1.0`
 - invalid: `1.0.0-`
 - invalid: `1.0.0+`
+
+## Branch conventions
+
+Use `master` as the primary branch.
+
+Recommended branch naming:
+- `release/x.y.z` for the upcoming release integration branch
+- `feat/...` for new features
+- `fix/...` for bug fixes
+- `docs/...` for documentation-only changes
+- `chore/...` for maintenance tasks
+
+Examples:
+- `release/0.5.0`
+- `release/1.0.0`
+- `feat/analyzer-endpoint`
+- `fix/api-error-handling`
+- `docs/readme-api-usage`
 
 ## Recommended workflows
 
