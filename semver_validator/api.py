@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 from urllib import error, request
 
 from dotenv import load_dotenv
@@ -8,7 +9,8 @@ from pydantic import BaseModel
 
 from semver_validator.main import validate_semver
 
-load_dotenv()
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(PROJECT_ROOT / ".env")
 
 
 class AnalyzeRequest(BaseModel):

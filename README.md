@@ -19,7 +19,9 @@ correctness rather than accept loosely formatted version strings.
 - CLI support for direct validation
 - Interactive CLI mode
 - FastAPI `/validate` endpoint
+- FastAPI `/analyze` endpoint for backend Gemini-powered release analysis
 - Lightweight packaging via `pyproject.toml`
+- Automated tests for validator, CLI, and API behavior
 
 ## Project Layout
 
@@ -38,6 +40,10 @@ correctness rather than accept loosely formatted version strings.
   - repo-specific agent instructions
 - `CODEX.md`
   - Codex/OpenAI-style default workflow guidance
+- `tests/`
+  - automated tests for validator, CLI, and API behavior
+- `docs/1.0.0-checklist.md`
+  - stabilization checklist for the `1.0.0` release
 
 ## Requirements
 
@@ -281,6 +287,10 @@ Recommended workflows for agent-based changes include:
 - docs sync workflow
 - breaking change gate
 
+There is also a dedicated stabilization checklist for the stable release in:
+
+- `docs/1.0.0-checklist.md`
+
 If you are making automated or agent-assisted changes, keep the following
 principles in mind:
 
@@ -337,11 +347,22 @@ Recommended flow:
 
 Potential future additions could include:
 
-- automated tests for valid and invalid SemVer cases
-- CI checks for CLI and API behavior
+- CI checks for validator, CLI, and API behavior
+- analyzer integration testing with a real local `GEMINI_API_KEY`
 - publishing workflow improvements
 - optional executable packaging
 - public API hardening and stability work for `1.0.0`
+
+For `1.0.0` planning and release readiness, see:
+
+- `docs/1.0.0-checklist.md`
+
+Current automated coverage includes:
+
+- core validator tests
+- CLI behavior tests
+- `/validate` endpoint tests
+- `/analyze` endpoint tests with mocked upstream responses
 
 ## License
 
