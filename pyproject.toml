@@ -4,12 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "semver-validator-cli" # Change this if you want a different PyPI name
-version = "0.1.0"
+version = "1.0.0"
 authors = [{ name="Your Name", email="your@email.com" }]
 description = "A SemVer 2.0.0 validator CLI and interactive tool."
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = []
+dependencies = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.20.0",
+    "python-dotenv>=1.0.0",
+]
 
 [project.scripts]
 semver-cli = "semver_validator.main:main"
