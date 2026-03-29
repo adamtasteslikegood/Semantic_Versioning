@@ -9,7 +9,8 @@ The repository currently includes:
 - a FastAPI API endpoint
 - agent instruction files for Codex/OpenAI-style workflows
 
-The validator is intentionally strict and is designed to preserve SemVer 2.0.0 correctness rather than accept loosely formatted version strings.
+The validator is intentionally strict and is designed to preserve SemVer 2.0.0
+correctness rather than accept loosely formatted version strings.
 
 ## Features
 
@@ -88,9 +89,11 @@ An example template is included in:
 - `.env_example`
 
 Important:
+
 - keep `.env` out of version control
 - do not expose the Gemini API key in frontend code
-- the FastAPI backend should read the key server-side and call Gemini on behalf of the frontend
+- the FastAPI backend should read the key server-side and call Gemini on behalf
+  of the frontend
 
 ## CLI Usage
 
@@ -183,7 +186,8 @@ Expected response:
 
 ### Analyzer endpoint
 
-The API also supports an analyzer endpoint that sends release-change context to Gemini from the backend instead of exposing the API key in the frontend.
+The API also supports an analyzer endpoint that sends release-change context to
+Gemini from the backend instead of exposing the API key in the frontend.
 
 Endpoint:
 
@@ -232,7 +236,8 @@ Expected response shape:
 }
 ```
 
-If `current_version` is invalid, the API should reject the request before attempting the Gemini call.
+If `current_version` is invalid, the API should reject the request before
+attempting the Gemini call.
 
 ## Validation Notes
 
@@ -276,7 +281,8 @@ Recommended workflows for agent-based changes include:
 - docs sync workflow
 - breaking change gate
 
-If you are making automated or agent-assisted changes, keep the following principles in mind:
+If you are making automated or agent-assisted changes, keep the following
+principles in mind:
 
 - preserve strict SemVer 2.0.0 behavior
 - keep `validate_semver()` as the single source of truth
@@ -301,6 +307,7 @@ Script entrypoint:
 Use `master` as the primary branch.
 
 Recommended branch naming:
+
 - `release/x.y.z` for the upcoming release integration branch
 - `feat/...` for new features
 - `fix/...` for bug fixes
@@ -308,6 +315,7 @@ Recommended branch naming:
 - `chore/...` for maintenance tasks
 
 Examples:
+
 - `release/0.5.0`
 - `release/1.0.0`
 - `feat/analyzer-endpoint`
@@ -315,8 +323,10 @@ Examples:
 - `docs/readme-api-usage`
 
 Recommended flow:
+
 1. create or update the active `release/x.y.z` branch from `master`
-2. merge completed `feat/...`, `fix/...`, `docs/...`, and `chore/...` branches into the active release branch
+2. merge completed `feat/...`, `fix/...`, `docs/...`, and `chore/...` branches
+   into the active release branch
 3. verify CLI, API, and analyzer behavior
 4. update documentation and package metadata
 5. finalize the release branch
@@ -339,4 +349,5 @@ Add a license file if you plan to distribute the project publicly.
 
 ## Contributing
 
-Keep changes small, explicit, and consistent with the current behavior of the validator. Favor correctness and interface stability over broader refactors.
+Keep changes small, explicit, and consistent with the current behavior of the
+validator. Favor correctness and interface stability over broader refactors.

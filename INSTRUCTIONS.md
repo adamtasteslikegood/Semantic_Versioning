@@ -1,6 +1,8 @@
 # Project Evolution and Publishing Guide
 
-This document describes how to take this repository from a local Python project to a packaged and published Semantic Versioning validator with a FastAPI backend and a backend-powered Gemini analyzer.
+This document describes how to take this repository from a local Python project
+to a packaged and published Semantic Versioning validator with a FastAPI backend
+and a backend-powered Gemini analyzer.
 
 The project is currently centered around:
 
@@ -74,7 +76,8 @@ pip install -e .
 
 ### Option B: Direct dependency install
 
-If you are not installing the package itself yet, you can install the runtime dependencies directly:
+If you are not installing the package itself yet, you can install the runtime
+dependencies directly:
 
 ```bash
 pip install fastapi uvicorn
@@ -107,7 +110,9 @@ Use Semantic Versioning carefully:
 - `MINOR` for backward-compatible functionality additions
 - `PATCH` for backward-compatible bug fixes
 
-Before `1.0.0`, breaking changes are still allowed, but they should be made intentionally, documented clearly, and used to move the project toward a stable public contract.
+Before `1.0.0`, breaking changes are still allowed, but they should be made
+intentionally, documented clearly, and used to move the project toward a stable
+public contract.
 
 For this repository, treat the following as public contracts:
 
@@ -116,7 +121,8 @@ For this repository, treat the following as public contracts:
 - API request/response behavior for `/validate`
 - API request/response behavior for `/analyze`
 
-If one of those changes in a breaking way, that should be considered a major-version concern.
+If one of those changes in a breaking way, that should be considered a
+major-version concern.
 
 ## Phase 1: Core Validator and CLI
 
@@ -196,7 +202,8 @@ curl "http://127.0.0.1:8000/validate?version=1.2.3"
 
 ## Phase 3: Gemini Analyzer Endpoint
 
-Goal: move AI release analysis to the backend so secrets remain secure and the frontend only talks to your own API.
+Goal: move AI release analysis to the backend so secrets remain secure and the
+frontend only talks to your own API.
 
 ### Backend design
 
@@ -342,6 +349,7 @@ Use `MAJOR` when:
 Use `master` as the primary branch.
 
 Recommended branch naming:
+
 - `release/x.y.z` for the upcoming release integration branch
 - `feat/...` for new features
 - `fix/...` for bug fixes
@@ -349,6 +357,7 @@ Recommended branch naming:
 - `chore/...` for maintenance tasks
 
 Examples:
+
 - `release/0.5.0`
 - `release/1.0.0`
 - `feat/analyzer-endpoint`
@@ -356,8 +365,11 @@ Examples:
 - `docs/readme-api-usage`
 
 Recommended flow:
-- branch feature work from the active release branch or from `master`, depending on team preference
-- merge completed `feat/...`, `fix/...`, `docs/...`, and `chore/...` branches into the active `release/x.y.z` branch
+
+- branch feature work from the active release branch or from `master`, depending
+  on team preference
+- merge completed `feat/...`, `fix/...`, `docs/...`, and `chore/...` branches
+  into the active `release/x.y.z` branch
 - finalize and verify the release branch
 - merge the completed release branch back into `master`
 - tag the release from `master`
@@ -372,7 +384,8 @@ Whenever behavior changes, review and update:
 - `GEMINI.md`
 - `.env_example`
 
-Keep documentation aligned with the actual repository state rather than a future roadmap that no longer matches the code.
+Keep documentation aligned with the actual repository state rather than a future
+roadmap that no longer matches the code.
 
 ## Non-goals
 
