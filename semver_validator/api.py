@@ -5,6 +5,9 @@ from urllib import error, request
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
+
+# from fastapi import FastAPI, Query, Body
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from semver_validator.main import validate_semver
@@ -18,14 +21,34 @@ class AnalyzeRequest(BaseModel):
     changes: str
 
 
+class AnalyzeResponse(BaseModel):
+    bump_type: str
+    next_version: str
+    explanation: str
+
+
 app = FastAPI(
     title="SemVer Validator API",
     description=(
         "A simple API to validate Semantic Versioning 2.0.0 strings and analyze "
         "release changes with Gemini."
     ),
-    version="1.0.0",
+    version="0.6.0",
 )
+
+
+# --- CORS CONFIGURATION ---
+# This tells the browser it's okay for your frontend to talk to this API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins (perfect for local development)
+    # For production, you'd restrict this to your actual frontend domain:
+    # allow_origins=["https://my-frontend-website.com"],
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
+# --------------------------
 
 
 @app.get("/validate")
@@ -155,8 +178,51 @@ def analyze_release(request_body: AnalyzeRequest):
             },
         ) from exc
 
+    try:
+        validated_analysis = AnalyzeResponse.model_validate(analysis)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=502,
+            detail={
+                "message": "Gemini API returned an invalid analysis payload.",
+                "response": analysis,
+            },
+        ) from exc
+
+    if validated_analysis.bump_type not in {
+        "MAJOR",
+        "MINOR",
+        "PATCH",
+        "INVALID_FORMAT",
+    }:
+        raise HTTPException(
+            status_code=502,
+            detail={
+                "message": "Gemini API returned an unsupported bump_type.",
+                "response": validated_analysis.model_dump(),
+            },
+        )
+
+    if not validated_analysis.next_version.strip():
+        raise HTTPException(
+            status_code=502,
+            detail={
+                "message": "Gemini API returned an empty next_version.",
+                "response": validated_analysis.model_dump(),
+            },
+        )
+
+    if not validated_analysis.explanation.strip():
+        raise HTTPException(
+            status_code=502,
+            detail={
+                "message": "Gemini API returned an empty explanation.",
+                "response": validated_analysis.model_dump(),
+            },
+        )
+
     return {
         "current_version": request_body.current_version,
         "validation": validation_result,
-        "analysis": analysis,
+        "analysis": validated_analysis.model_dump(),
     }

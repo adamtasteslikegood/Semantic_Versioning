@@ -83,6 +83,34 @@ dependencies directly:
 pip install fastapi uvicorn
 ```
 
+### Option C: `uv` workflow
+
+If you prefer `uv` for dependency and environment management, sync the project
+environment from the repository root:
+
+```bash
+uv sync
+```
+
+Run project commands through the managed environment:
+
+```bash
+uv run semver-cli 1.2.3
+uv run python -m semver_validator.main 1.2.3
+uv run uvicorn semver_validator.api:app --reload
+```
+
+If you want to run the automated tests through `uv`, include the optional test
+dependencies as well:
+
+```bash
+uv sync --extra test
+uv run pytest -q
+```
+
+If your `uv` environment does not yet include the test tools, `uv run pytest`
+may fail until the optional test dependencies are synced.
+
 ## Environment Variables
 
 The analyzer endpoint expects a Gemini API key to be available to the backend.
@@ -175,6 +203,14 @@ Interactive mode:
 semver-cli --interactive
 ```
 
+Using `uv`:
+
+```bash
+uv run semver-cli 1.2.3
+uv run python -m semver_validator.main 1.2.3
+uv run semver-cli --interactive
+```
+
 ## Phase 2: FastAPI Backend
 
 Goal: expose the validator over HTTP while preserving the same core behavior.
@@ -192,6 +228,12 @@ Run the API locally:
 
 ```bash
 uvicorn semver_validator.api:app --reload
+```
+
+With `uv`:
+
+```bash
+uv run uvicorn semver_validator.api:app --reload
 ```
 
 Validate a version:
@@ -286,6 +328,8 @@ Current runtime dependencies should include:
 
 ### Build the package
 
+Using standard Python tooling:
+
 ```bash
 python -m build
 ```
@@ -294,6 +338,36 @@ If needed, install build tooling first:
 
 ```bash
 pip install build
+```
+
+Using `uv`:
+
+```bash
+uv build
+```
+
+### Test the package locally before release
+
+Using standard Python tooling:
+
+```bash
+pip install -e .[test]
+pytest -q
+```
+
+Using `uv`:
+
+```bash
+uv sync --extra test
+uv run pytest -q
+```
+
+To verify the built wheel in a clean environment:
+
+```bash
+python -m venv .venv-release-test
+.venv-release-test/bin/pip install dist/semver_validator_cli-0.5.0-py3-none-any.whl
+.venv-release-test/bin/semver-cli 1.2.3
 ```
 
 ### Publish the package

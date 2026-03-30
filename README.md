@@ -82,6 +82,27 @@ pip install -e .
 pip install fastapi uvicorn
 ```
 
+### Option 3: Use `uv` for local development
+
+Sync the project environment and dependencies:
+
+```bash
+uv sync
+```
+
+Run commands through the managed environment:
+
+```bash
+uv run semver-cli 1.2.3
+uv run python -m semver_validator.main 1.2.3
+uv run uvicorn semver_validator.api:app --reload
+```
+
+Note:
+- `uv sync` installs the default project environment
+- test-only tools such as `pytest` may require syncing optional test dependencies depending on your `uv` workflow
+- if `uv run pytest -q` reports that `pytest` is missing, sync/install the test extras before rerunning your tests
+
 ## Environment Setup
 
 Create a local `.env` file for development and set your Gemini API key there:
@@ -157,12 +178,24 @@ Or:
 python -m semver_validator.main --interactive
 ```
 
+With `uv`:
+
+```bash
+uv run semver-cli --interactive
+```
+
 ## API Usage
 
 Run the FastAPI app locally with Uvicorn:
 
 ```bash
 uvicorn semver_validator.api:app --reload
+```
+
+With `uv`:
+
+```bash
+uv run uvicorn semver_validator.api:app --reload
 ```
 
 Then call the validation endpoint:
@@ -311,6 +344,49 @@ Current package version:
 Script entrypoint:
 
 - `semver-cli = "semver_validator.main:main"`
+
+## Testing and Build Workflow
+
+Run the automated tests with `pip`-style local environments:
+
+```bash
+pytest -q
+```
+
+If you are using the optional test dependencies:
+
+```bash
+pip install -e .[test]
+pytest -q
+```
+
+Run the automated tests with `uv`:
+
+```bash
+uv run pytest -q
+```
+
+If `pytest` is not available in the `uv` environment yet, sync/install the test extras first, then rerun the tests.
+
+Build distribution artifacts with standard Python tooling:
+
+```bash
+python -m build
+```
+
+Build distribution artifacts with `uv`:
+
+```bash
+uv build
+```
+
+To verify the built wheel in a clean environment:
+
+```bash
+python -m venv .venv-release-test
+.venv-release-test/bin/pip install dist/semver_validator_cli-0.5.0-py3-none-any.whl
+.venv-release-test/bin/semver-cli 1.2.3
+```
 
 ## Release Workflow
 

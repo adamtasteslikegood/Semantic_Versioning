@@ -4,7 +4,7 @@ from urllib.error import HTTPError, URLError
 from fastapi.testclient import TestClient
 
 from semver_validator import api as api_module
-from semver_validator.api import app
+from semver_validator.api import AnalyzeResponse, app
 
 client = TestClient(app)
 
@@ -183,3 +183,199 @@ def test_analyze_endpoint_returns_502_for_unexpected_gemini_response(monkeypatch
     body = response.json()["detail"]
     assert body["message"] == "Gemini API returned an unexpected response format."
     assert body["response"] == {"candidates": []}
+
+
+def test_analyze_response_model_accepts_valid_payload():
+    result = AnalyzeResponse.model_validate(
+        {
+            "bump_type": "PATCH",
+            "next_version": "0.5.1",
+            "explanation": "This is a backward-compatible bug fix.",
+        }
+    )
+
+    assert result.bump_type == "PATCH"
+    assert result.next_version == "0.5.1"
+    assert result.explanation == "This is a backward-compatible bug fix."
+
+
+def test_analyze_endpoint_returns_502_for_invalid_analysis_shape(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+
+    gemini_payload = {
+        "candidates": [
+            {
+                "content": {
+                    "parts": [
+                        {
+                            "text": json.dumps(
+                                {
+                                    "bump_type": "MINOR",
+                                    "next_version": "0.6.0",
+                                }
+                            )
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+
+    def fake_urlopen(req, timeout=30):
+        return FakeResponse(gemini_payload)
+
+    monkeypatch.setattr(api_module.request, "urlopen", fake_urlopen)
+
+    response = client.post(
+        "/analyze",
+        json={
+            "current_version": "0.5.0",
+            "changes": "- add analyzer endpoint",
+        },
+    )
+
+    assert response.status_code == 502
+    body = response.json()["detail"]
+    assert body["message"] == "Gemini API returned an invalid analysis payload."
+    assert body["response"] == {
+        "bump_type": "MINOR",
+        "next_version": "0.6.0",
+    }
+
+
+def test_analyze_endpoint_returns_502_for_unsupported_bump_type(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+
+    gemini_payload = {
+        "candidates": [
+            {
+                "content": {
+                    "parts": [
+                        {
+                            "text": json.dumps(
+                                {
+                                    "bump_type": "BREAKING",
+                                    "next_version": "1.0.0",
+                                    "explanation": "This should not be accepted.",
+                                }
+                            )
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+
+    def fake_urlopen(req, timeout=30):
+        return FakeResponse(gemini_payload)
+
+    monkeypatch.setattr(api_module.request, "urlopen", fake_urlopen)
+
+    response = client.post(
+        "/analyze",
+        json={
+            "current_version": "0.5.0",
+            "changes": "- breaking API change",
+        },
+    )
+
+    assert response.status_code == 502
+    body = response.json()["detail"]
+    assert body["message"] == "Gemini API returned an unsupported bump_type."
+    assert body["response"] == {
+        "bump_type": "BREAKING",
+        "next_version": "1.0.0",
+        "explanation": "This should not be accepted.",
+    }
+
+
+def test_analyze_endpoint_returns_502_for_empty_next_version(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+
+    gemini_payload = {
+        "candidates": [
+            {
+                "content": {
+                    "parts": [
+                        {
+                            "text": json.dumps(
+                                {
+                                    "bump_type": "PATCH",
+                                    "next_version": "   ",
+                                    "explanation": "Bug fix only.",
+                                }
+                            )
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+
+    def fake_urlopen(req, timeout=30):
+        return FakeResponse(gemini_payload)
+
+    monkeypatch.setattr(api_module.request, "urlopen", fake_urlopen)
+
+    response = client.post(
+        "/analyze",
+        json={
+            "current_version": "0.5.0",
+            "changes": "- bug fix",
+        },
+    )
+
+    assert response.status_code == 502
+    body = response.json()["detail"]
+    assert body["message"] == "Gemini API returned an empty next_version."
+    assert body["response"] == {
+        "bump_type": "PATCH",
+        "next_version": "   ",
+        "explanation": "Bug fix only.",
+    }
+
+
+def test_analyze_endpoint_returns_502_for_empty_explanation(monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+
+    gemini_payload = {
+        "candidates": [
+            {
+                "content": {
+                    "parts": [
+                        {
+                            "text": json.dumps(
+                                {
+                                    "bump_type": "PATCH",
+                                    "next_version": "0.5.1",
+                                    "explanation": "   ",
+                                }
+                            )
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+
+    def fake_urlopen(req, timeout=30):
+        return FakeResponse(gemini_payload)
+
+    monkeypatch.setattr(api_module.request, "urlopen", fake_urlopen)
+
+    response = client.post(
+        "/analyze",
+        json={
+            "current_version": "0.5.0",
+            "changes": "- bug fix",
+        },
+    )
+
+    assert response.status_code == 502
+    body = response.json()["detail"]
+    assert body["message"] == "Gemini API returned an empty explanation."
+    assert body["response"] == {
+        "bump_type": "PATCH",
+        "next_version": "0.5.1",
+        "explanation": "   ",
+    }
