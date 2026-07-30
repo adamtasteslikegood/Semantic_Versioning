@@ -54,7 +54,7 @@ Prefer small, correct, maintainable changes over broad refactors.
      reason.
 
 3. **Versioning discipline**
-   - This project is currently at `0.6.0` and is still pre-`1.0.0`.
+   - This project is currently at `0.7.0` and is still pre-`1.0.0`.
    - Breaking changes are still allowed before `1.0.0`, but they should be made
      intentionally and documented clearly.
    - The goal for `1.0.0` is to stabilize the CLI interface, API contracts, and

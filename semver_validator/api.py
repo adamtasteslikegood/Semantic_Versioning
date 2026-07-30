@@ -39,7 +39,7 @@ app = FastAPI(
         "A simple API to validate Semantic Versioning 2.0.0 strings and analyze "
         "release changes with Gemini."
     ),
-    version="0.6.0",
+    version="0.7.0",
 )
 
 
