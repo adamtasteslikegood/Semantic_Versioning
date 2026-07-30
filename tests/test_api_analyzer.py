@@ -9,6 +9,13 @@ from semver_validator.api import AnalyzeResponse, app
 client = TestClient(app)
 
 
+def test_index_serves_the_interactive_page():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/html")
+    assert "AI Release Analyzer" in response.text
+
+
 class FakeResponse:
     def __init__(self, payload):
         self._payload = payload
