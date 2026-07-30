@@ -8,6 +8,7 @@ from fastapi import FastAPI, HTTPException, Query
 
 # from fastapi import FastAPI, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from semver_validator.main import validate_semver
@@ -54,6 +55,15 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 # --------------------------
+
+
+@app.get("/", include_in_schema=False)
+def index():
+    """
+    Serve the interactive SemVer Explorer page (rules, simulator, regex
+    parser, and the Gemini-backed AI Release Analyzer wired to /analyze).
+    """
+    return FileResponse(PROJECT_ROOT / "semantic_versioning.html")
 
 
 @app.get("/validate")
