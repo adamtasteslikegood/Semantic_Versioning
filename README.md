@@ -122,6 +122,67 @@ Important:
 - the FastAPI backend should read the key server-side and call Gemini on behalf
   of the frontend
 
+### Environment variables
+
+| Variable | Required | Default | Read by |
+|---|---|---|---|
+| `GEMINI_API_KEY` | Only for `/analyze` | — | `POST /analyze` |
+| `GEMINI_MODEL` | No | `gemini-3-flash-preview` | `POST /analyze` |
+| `PORT` | Set by the host | — | the `Procfile` start command |
+
+`GET /validate` reads **no** environment variables — it is pure regex validation
+and works with nothing configured.
+
+## Deployment
+
+The app is a standard ASGI application, so any host that can run `uvicorn` will
+serve it. A `Procfile` is committed with the start command:
+
+```
+web: uvicorn semver_validator.api:app --host 0.0.0.0 --port $PORT
+```
+
+Binding `0.0.0.0` and reading `$PORT` are both required — a host assigns the
+port at runtime, and binding `127.0.0.1` would make the container unreachable.
+
+### Railway
+
+1. Create a project from this repository. Nixpacks detects Python via
+   `pyproject.toml` and honours the `Procfile`; `.python-version` pins the
+   interpreter to 3.12.
+2. Generate a domain for the service (a `*.up.railway.app` subdomain is enough
+   to start; a custom domain can be attached later).
+3. Set `GEMINI_API_KEY` in the service variables **if** you want `/analyze`.
+   Skip it and `/validate` still works — `/analyze` returns HTTP 500 with a
+   message naming the missing variable rather than failing obscurely.
+
+Verify a deploy with the endpoint that needs no credentials:
+
+```bash
+curl -s "https://<your-domain>/validate?version=1.0.0-beta.1%2Bexp.sha.5114f85"
+# {"status":"pass","major":1,"minor":0,"patch":0,
+#  "prerelease":"beta.1","buildmetadata":"exp.sha.5114f85"}
+```
+
+Note that `+` must be percent-encoded as `%2B` in a query string, or it is
+decoded as a space and the build metadata is lost.
+
+### On other model providers
+
+`/analyze` is **Gemini-specific and will not work with an OpenAI key.** The
+provider is not just the credential:
+
+- the endpoint is `generativelanguage.googleapis.com`
+- authentication uses the `x-goog-api-key` header
+- the request body uses Gemini's `contents` / `parts` / `system_instruction`
+  shape, with `generationConfig.responseSchema` in Google's `OBJECT` / `STRING`
+  vocabulary
+- the response is parsed as `candidates[0].content.parts[0].text`
+
+`GEMINI_MODEL` switches models *within* Gemini. Supporting another provider
+would require a different request body, response parser, and auth header — a
+feature change, not configuration.
+
 ## CLI Usage
 
 You can validate a SemVer string from the command line.

@@ -15,6 +15,11 @@ from semver_validator.main import validate_semver
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(PROJECT_ROOT / ".env")
 
+# The Gemini model used by /analyze. Overridable with the GEMINI_MODEL
+# environment variable so a deployment can change models without a code change;
+# the default preserves the previously hardcoded value.
+DEFAULT_GEMINI_MODEL = "gemini-3-flash-preview"
+
 
 class AnalyzeRequest(BaseModel):
     current_version: str
@@ -135,7 +140,11 @@ def analyze_release(request_body: AnalyzeRequest):
         },
     }
 
-    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent"
+    model = os.getenv("GEMINI_MODEL", DEFAULT_GEMINI_MODEL)
+    url = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        f"{model}:generateContent"
+    )
     body = json.dumps(payload).encode("utf-8")
     req = request.Request(
         url,
